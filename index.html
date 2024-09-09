@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Rubik's Cube</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="cube">
+        <div class="face face-front" data-face="front"></div>
+        <div class="face face-back" data-face="back"></div>
+        <div class="face face-left" data-face="left"></div>
+        <div class="face face-right" data-face="right"></div>
+        <div class="face face-top" data-face="top"></div>
+        <div class="face face-bottom" data-face="bottom"></div>
+    </div>
+    <div id="controls">
+        <button id="scramble">Scramble</button>
+        <button id="solve">Solve</button>
+        <button id="reset">Reset</button>
+        <button id="enter-sequence">Enter Sequence</button>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

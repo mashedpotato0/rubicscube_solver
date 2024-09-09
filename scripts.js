@@ -208,6 +208,7 @@ class RubiksCube {
     }
 
     scramble() {
+        this.reset();
         const moves = ['front', 'back', 'left', 'right', 'top', 'bottom'];
         for (let i = 0; i < 7; i++) {
             const move = moves[Math.floor(Math.random() * moves.length)];

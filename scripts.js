@@ -1,43 +1,23 @@
 class RubiksCube {
     constructor() {
-        this.faces = {
-            front: [
-                [0, 1, 2],
-                [3, 4, 5],
-                [6, 7, 8]
-            ],
-            back: [
-                [9, 10, 11],
-                [12, 13, 14],
-                [15, 16, 17]
-            ],
-            left: [
-                [18, 19, 20],
-                [21, 22, 23],
-                [24, 25, 26]
-            ],
-            right: [
-                [27, 28, 29],
-                [30, 31, 32],
-                [33, 34, 35]
-            ],
-            top: [
-                [36, 37, 38],
-                [39, 40, 41],
-                [42, 43, 44]
-            ],
-            bottom: [
-                [45, 46, 47],
-                [48, 49, 50],
-                [51, 52, 53]
-            ]
-        };
-        this.count = 0;
-        
 
-        this.updateFaceColors();
+        this.initializeCube();
         this.addEventListeners();
     }
+    initializeCube() {
+        this.faces = {
+            front: [[0, 1, 2], [3, 4, 5], [6, 7, 8]],
+            back: [[9, 10, 11], [12, 13, 14], [15, 16, 17]],
+            left: [[18, 19, 20], [21, 22, 23], [24, 25, 26]],
+            right: [[27, 28, 29], [30, 31, 32], [33, 34, 35]],
+            top: [[36, 37, 38], [39, 40, 41], [42, 43, 44]],
+            bottom: [[45, 46, 47], [48, 49, 50], [51, 52, 53]]
+        };
+        this.count = 0;
+        this.maxIterations = 1000; // Add a maximum iteration limit
+        this.updateFaceColors();
+    }
+
 
     flattenCube() {
         const flattenedArray = [];
@@ -208,51 +188,18 @@ class RubiksCube {
     }
 
     scramble() {
-        this.reset();
+        this.initializeCube(); // Reset the cube before scrambling
         const moves = ['front', 'back', 'left', 'right', 'top', 'bottom'];
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 20; i++) {
             const move = moves[Math.floor(Math.random() * moves.length)];
             const clockwise = Math.random() > 0.5;
             this.rotateFace(move, clockwise);
         }
+        this.updateFaceColors();
     }
 
     reset() {
-
-        this.faces = {
-            front: [
-                [0, 1, 2],
-                [3, 4, 5],
-                [6, 7, 8]
-            ],
-            back: [
-                [9, 10, 11],
-                [12, 13, 14],
-                [15, 16, 17]
-            ],
-            left: [
-                [18, 19, 20],
-                [21, 22, 23],
-                [24, 25, 26]
-            ],
-            right: [
-                [27, 28, 29],
-                [30, 31, 32],
-                [33, 34, 35]
-            ],
-            top: [
-                [36, 37, 38],
-                [39, 40, 41],
-                [42, 43, 44]
-            ],
-            bottom: [
-                [45, 46, 47],
-                [48, 49, 50],
-                [51, 52, 53]
-            ]
-        };
-        this.count = 0;
-        this.updateFaceColors();
+        this.initializeCube();
     }
     addEventListeners() {
         let isDragging = false;
@@ -310,7 +257,6 @@ class RubiksCube {
                     break;
                 case '2':
                     ctrlKey ? this.rotateFace('back', false) : this.rotateFace('back', true);
-                    this.logshape();
                     break;
                 case '3':
                     ctrlKey ? this.rotateFace('left', false) : this.rotateFace('left', true);
@@ -1149,7 +1095,7 @@ class RubiksCube {
                 case 5:
                     this.enterSequence(seq[0]);
                     flag = this.getflag2();
-                    console.log(flag);
+                    //console.log(flag);
                     break;
                 case 0:
                     this.enterSequence('4');
@@ -1228,24 +1174,29 @@ class RubiksCube {
     
 
     solve() {
-        console.time('solveTime');  // Start timing
-    
-        let a = this.count;
-        this.solveWhiteCross();
-        this.solveWhiteCorners();
-        this.solveMiddleLayerEdges();
-        this.solveYellowCross();
-        // this.logshape();
-        this.solveYellowCorners();
-        // this.permuteYellowCorners();
-        this.permuteYellowEdges();
-        this.permuteYellowEdges1();
-    
-        let b = this.count;
-        //console.log(b);
+        console.time('solveTime');
+        this.count = 0; // Reset count at the start of solving
+        
+        const solvingSteps = [
+            this.solveWhiteCross,
+            this.solveWhiteCorners,
+            this.solveMiddleLayerEdges,
+            this.solveYellowCross,
+            this.solveYellowCorners,
+            this.permuteYellowEdges,
+            this.permuteYellowEdges1
+        ];
+
+        for (const step of solvingSteps) {
+            step.call(this);
+            if (this.count > this.maxIterations) {
+                console.error('Max iterations reached. Stopping solve process.');
+                break;
+            }
+        }
+
         this.updateFaceColors();
-    
-        console.timeEnd('solveTime');  // End timing and log the elapsed time
+        console.timeEnd('solveTime');
     }
     
 }
@@ -1253,15 +1204,28 @@ class RubiksCube {
 
 document.addEventListener('DOMContentLoaded', () => {
     const cube = new RubiksCube();
-    cube.updateFaceColors();
     
-    document.getElementById('scramble').addEventListener('click', () => cube.scramble());
-    document.getElementById('reset').addEventListener('click', () => cube.reset());
-    document.getElementById('solve').addEventListener('click', () => cube.solve());
+    document.getElementById('scramble').addEventListener('click', () => {
+        cube.scramble();
+        console.log('Cube scrambled');
+    });
+    
+    document.getElementById('reset').addEventListener('click', () => {
+        cube.reset();
+        console.log('Cube reset');
+    });
+    
+    document.getElementById('solve').addEventListener('click', () => {
+        console.log('Starting solve process');
+        cube.solve();
+        console.log('Solve process completed');
+    });
+    
     document.getElementById('enter-sequence').addEventListener('click', () => {
         const sequence = prompt('Enter the sequence of moves');
         if (sequence) {
             cube.enterSequence(sequence);
+            console.log('Sequence applied:', sequence);
         }
     });
 });

@@ -89,7 +89,7 @@ class RubiksCube {
                             cell.style.backgroundColor = 'grey';
                             break;
                     }
-                    cell.textContent = value;
+                    //cell.textContent = value;
                     faceDiv.appendChild(cell);
                 });
             });
